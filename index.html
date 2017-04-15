@@ -8,7 +8,6 @@
 <html class="theme-next mist use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
-    <meta name="baidu-site-verification" content="yF80712oqG" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -284,7 +283,7 @@
               
                 
                 <a class="post-title-link" href="/2017/04/13/cookie-parser001/" itemprop="url">
-                  关于connect中间件cookie-parser处理签名json Cookie的坑
+                  开博感想connect之cookie-parser处理签名json Cookie的坑
                 </a>
               
             
@@ -360,7 +359,23 @@
       
         
           
-            <h2 id="为保护我加不加"><a href="#为保护我加不加" class="headerlink" title="为保护我加不加"></a>为保护我加不加</h2><h2 id="wenwkjnxk"><a href="#wenwkjnxk" class="headerlink" title="wenwkjnxk"></a><em>wenwkjnxk</em></h2>
+            <h1 id="关于connect中间件cookie-parser处理签名json-Cookie的坑"><a href="#关于connect中间件cookie-parser处理签名json-Cookie的坑" class="headerlink" title="关于connect中间件cookie-parser处理签名json Cookie的坑"></a>关于connect中间件cookie-parser处理签名json Cookie的坑</h1><h2 id="–引子"><a href="#–引子" class="headerlink" title="–引子"></a>–引子</h2><p>   &nbsp;&nbsp;&nbsp;&nbsp;　　　　　　有人认为爱是性，是婚姻，是清晨六点的吻，是一堆孩子，也许真是这样的,<br>   　　　　莱斯特小姐。但你知道我怎么想吗，我觉得爱是想触碰又收回手。</p>
+<pre><code>       　　　　　　　　　　　　　　　　　　　　　　　　　--——杰罗姆·大卫·塞林格（Jerome David Salinger）
+</code></pre><hr>
+<p> <img src="/images/blog_002_connect.jpg" height="500"></p>
+<hr>
+<p>   　　这是第一篇技术贴，可以说从萌生写个人博客的想法，到现在敲这行字，着实折腾了一阵儿，也痛苦着，就像代码这个行<br>   业一样,多少人耗离着青春,就像一场孤独而压抑的旅行，即便你知道终点就在那里，但还是要坚持走下去。之所以有了写博客<br>   的想法，一方面，马上面临毕业了，迟迟没有踏上求职的路，因为我觉得如今是一个数字而非展示的时代，所需要的是insert<br>   +update，而不是select+show,有一种人永远被需要，有一种人也永远无关紧要，而数字的意义就是优化配比，从大三开始对<br>   java为主的技术栈展开整理与练习，强化了java基础知识，和面向对象的思想，搭建并练习经典的struts,hibernate,spring<br>   框架，在大四上学期,有一些彷徨，并计划继续在java web方向学习比较常用得spring mvc等技术，但在校内实习期间先后接<br>   触到了Android和H5，js，以及jetBrian旗下的Android studio，webstorm等IDE，可以说是对我的一种触动，让我意识到了现<br>   代开发的方向和趋势，最后我选择了在已经有了java基础和web开发经验的条件下，继续学习以H5，js展开的现代化web技术栈，<br>   从最开始的HTML5，CSS3，JavaScript吗，之后又接触到前端js框架jQuery,Ajax处理异步请求，基础的php知识，再到大四下学<br>   期，开始学习node，知道了原来可以甩开apache等服务器，自己建服务器，可以前后端一种语言，可以说一边学习也一边经历<br>   着前端的革命性爆发，react native，PWA，逐渐成熟，技术就是这样，它常常痛苦，常常疲惫，但它的未知性和野蛮生长也刺<br>   激着每一颗不安分的心，学习了不同的语言，不同的技术，有时候也会有想写博客的冲动，但最后都不了了之，也考虑到马上<br>   面临就业，相比代码，不想在文字上浪费时间。<br>   　　但这次下定决心，也可以说，被刺激到了，在学习node的connect这部分时，我看的是node in action这本书，怎么说也是<br>   图灵系列，但还是经常有小的错误，要边看边改，但也是一种提高吧，但在demo connect的cookie-parser这个中间件的签名与<br>   解签json cookie的功能时，一下子被卡了很久，各种百度，先后解决了windows的curl不能处理单引号内套双引号，需要对双<br>   引号内得双引号进行转义，但最后关于解签json cookie就是搞不定，网上也没有办法，没办法，看cookie-parser源码吧，最<br>   后熬了几天，终于解决了，因为书上代码已经老了，cookie-parser这个中间件现在已经单独分离出来，不在作为connect自带<br>   的中间件，除了原来一些connect直接调的方法要改变用法，最坑的是查看源码后发现cookie-parser这个中间件内部实现用到<br>   cookie-signature这个中间件，里面有签名sign和解签unsign方法，在我demo的时候先是对一个cookie值用sign方法进行签名，<br>   cookie值有两种情况，常规的值，和json形式，用了sign方法后返回一个串，cookie值.加密后的base64码，比较坑的地方是，<br>   在node后台监听端口，并对connect添加cookie-parser中间件后，用curl 提交cookie如果是json cookie，在cookie的key上要<br>   加前缀j：，如果是签名cookie，要加前缀s：，这个是书中没提的，也是我百度后找到的，那么最后最坑的问题来了，也是百<br>   度不到，需要读源码解决的，就是如果提交一个cookie值既是签名的，也是jsoncookie，怎么搞，首先很自然的想到在curl时<br>   加两个后缀，也就是s:j:，事实证明在客户端这么curl是没问题的，问题出在node服务端对原始的json cookie如何签名，开始<br>   就是调sign方法在第一个参数直接用json字符串，但就是不行，最后发现，sign和unsign方法是对字符串以s：进行分割，也就<br>   是只写json串造成了签名时是json，解签时是j:json值，其中在对j：的解析是独立进行，很容易混淆，所以只要在签名时也加<br>   上j：就好了，废话到这，上代码干货。</p>
+<hr>
+<p>  <strong>以下是在node服务端用connect加入cookie-parser中间件源码</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Created by Administrator on 2017/4/7.</div><div class="line"> */</div><div class="line"><span class="comment">//解析来自浏览器的cookie，放到req.cookies中</span></div><div class="line"><span class="keyword">var</span> connect=<span class="built_in">require</span>(<span class="string">'connect'</span>);</div><div class="line"><span class="keyword">var</span> cookieParser=<span class="built_in">require</span>(<span class="string">'cookie-parser'</span>);</div><div class="line"><span class="keyword">var</span> cookieSignature=<span class="built_in">require</span>(<span class="string">'cookie-signature'</span>);</div><div class="line"><span class="comment">// console.log('加密哈希值：'+cookieSignature.sign('j:&#123;\"dage\":\"xiuyuan\"&#125;','dakang'));</span></div><div class="line"><span class="comment">// console.log('加密哈希值：'+cookieSignature.sign('xiaokeai','dakang'));</span></div><div class="line">app=connect()</div><div class="line">    .use(cookieParser(<span class="string">'dakang'</span>))</div><div class="line">    .use(<span class="function"><span class="keyword">function</span> (<span class="params">req,res</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(req.cookies);</div><div class="line">        <span class="built_in">console</span>.log(req.signedCookies);</div><div class="line">        res.end(<span class="string">'hello xbao\n'</span>);</div><div class="line">    &#125;).listen(<span class="number">3000</span>);</div></pre></td></tr></table></figure>
+<p>   <strong>&nbsp;&nbsp;下图是在curl端输入的命令，注：其中解签用的base64码，需要先签名，输出控制台，也就是上面<br>   代码部分，我注掉的两行，因为懒，所以一并贴到下面图后面的node控制台部分</strong></p>
+<p>  <img src="/images/blog_002_code002.png" width="677" height="442"></p>
+<hr>
+<p>   <strong>&nbsp;&nbsp;下图是在node控制台对cookie值进行签名，并console输出SHA-1 HMAC生成的加密哈希值，将对应<br>   的值带到客户端进行提交cookie，node服务端继续处理，并在console中分别输出cookies，和signedcookies</strong></p>
+<p>  <img src="/images/blog_002_code001.png" width="1000" height="600"></p>
+<hr>
+<p>  还是因为懒，所以图片中的控制台主要参见最后几行的部分<br>  另外注意：当提交多个cookie是，应当如图片所示，以  ;  进行分隔，不是像书中那样用 ,</p>
+
           
         
       
@@ -426,7 +441,7 @@
               
                 
                 <a class="post-title-link" href="/2017/04/11/hello-world/" itemprop="url">
-                  Xbao 的个人博客
+                  Xbao join 博客入门demo
                 </a>
               
             
@@ -502,8 +517,9 @@
       
         
           
-            <h2 id="欢迎来到小宝的个人博客，这是小宝用node-Hexo-git搭的一个托管站点，以记录技术历程和个人心得，力求内容的独到性，希望各位看官多加指正，多多交流"><a href="#欢迎来到小宝的个人博客，这是小宝用node-Hexo-git搭的一个托管站点，以记录技术历程和个人心得，力求内容的独到性，希望各位看官多加指正，多多交流" class="headerlink" title="欢迎来到小宝的个人博客，这是小宝用node+ Hexo+git搭的一个托管站点，以记录技术历程和个人心得，力求内容的独到性，希望各位看官多加指正，多多交流"></a>欢迎来到小宝的个人博客，这是小宝用node+ <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>+git搭的一个托管站点，以记录技术历程和个人心得，力求内容的独到性，希望各位看官多加指正，多多交流</h2><img src="/images/ligou001.png" width="1000" height="600">
-<h2 id="扎铁了吗，老心"><a href="#扎铁了吗，老心" class="headerlink" title="扎铁了吗，老心~~~"></a>扎铁了吗，老心~~~</h2><h3 id="通过以下命令进入小宝的世界"><a href="#通过以下命令进入小宝的世界" class="headerlink" title="通过以下命令进入小宝的世界"></a>通过以下命令进入小宝的世界</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ xbao new <span class="string">"小宝最帅了呢"</span></div></pre></td></tr></table></figure>
+            <h1 id="记录小宝的点滴"><a href="#记录小宝的点滴" class="headerlink" title="记录小宝的点滴"></a>记录小宝的点滴</h1><p>   　　欢迎来到小宝的个人博客，这是小宝用node+ <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>+git搭的一个托管站点，以记录技术历程和个人心<br>   得，力求内容的独到性，希望各位看官多加指正，多多交流.可以说为了搭这个博客，还是折腾的厉害，毕竟是强迫症，不过好<br>   在有node和git的基础，只是在申请域名，建站，markdown用法等地方懵逼并学习着，以及考虑到多说即将下架，引入了网易云<br>   跟帖的评论系统，虽然折腾，但是加油吧</p>
+<p><img src="/images/ligou001.png" width="1000" height="600"></p>
+<h2 id="铁心了吗，老扎"><a href="#铁心了吗，老扎" class="headerlink" title="铁心了吗，老扎~~~"></a>铁心了吗，老扎~~~</h2><h3 id="通过以下命令进入小宝的世界"><a href="#通过以下命令进入小宝的世界" class="headerlink" title="通过以下命令进入小宝的世界"></a>通过以下命令进入小宝的世界</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ xbao new <span class="string">"小宝最帅了呢"</span></div></pre></td></tr></table></figure>
 <p>全是套路: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
 <h3 id="如何快速get小宝"><a href="#如何快速get小宝" class="headerlink" title="如何快速get小宝"></a>如何快速get小宝</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ xbao server <span class="string">"二营长，他娘的意大利炮呢"</span></div></pre></td></tr></table></figure>
 <p>纳尼。。。: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
@@ -612,7 +628,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
